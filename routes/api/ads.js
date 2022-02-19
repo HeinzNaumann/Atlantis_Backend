@@ -1,5 +1,5 @@
 const express = require("express");
-const Anuncio = require("../../models/Anuncio");
+const Anuncio = require("../../models/Anuncio.js");
 //const jwtAuth = require("../../lib/jwtAuthMiddleware");
 
 
@@ -11,7 +11,7 @@ const router = express.Router();
 //Lista de anuncios
 router.get("/ads", /*jwtAuth*/ async (req, res, next) =>{
     try{
-
+        console.log("entrando en api")
         const name = req.query.name;
         const price = req.query.price;
         const tag = req.query.tag;
@@ -33,6 +33,7 @@ router.get("/ads", /*jwtAuth*/ async (req, res, next) =>{
         }
 
         const anuncios = await Anuncio.lista(filter, skip, limit, select, sort);
+        console.log("AQUI", anuncios)
         res.json({ results: anuncios });
     }catch (err){
         next(err)
@@ -46,7 +47,7 @@ router.get("/:identificador", async (req, res, next) =>{
         const _id = req.params.identificador;
 
         const anuncio = await Anuncio.find({_id: _id});
-        res.json({ result: ad });
+        res.json({ result: anuncio });
     }catch(err){
         next (err);
     }
