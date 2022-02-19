@@ -64,20 +64,22 @@ async function initAnuncios() {
 }
 
 async function initUsuarios() {
-  //const { deletedCount } = await Usuario.
+  //const { deletedCount } = await Usuario;
   await Usuario.deleteMany({});
   console.log('Usuarios borrados.');
- // console.log(`Eliminados ${deletedCount} usuarios.`);
-  /*
+  //console.log(`Eliminados ${deletedCount} usuarios.`);
+  
   const result = await Usuario.insertMany([
-    {
+    { 
+      nombre: "admin",
       email: 'admin@example.com',
       password: await Usuario.hashPassword('1234')
     },
     {
+      nombre:"user",
       email: 'user@example.com',
       password: await Usuario.hashPassword('1234')
     }
-  ]); */
-  //console.log(`Insertados ${result.length} usuarios.`)
+  ]); 
+  console.log(`Insertados ${result.length} usuarios.`)
 }
