@@ -26,7 +26,9 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 
 //Rutas del API
-app.use("/api", require("./routes/api/ads"))
+app.use("/api/ads/", require("./routes/api/ads"));
+
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

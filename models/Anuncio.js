@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const adSchema = new mongoose.Schema({
   nombre: { type: String, index: true },
   imagen: String,
-  description: { type: String },
+  descripcion: { type: String },
   venta: { type: Boolean, index: true },
   precio: { type: Number, index: true },
   tags: { type: [String], index: true },
@@ -21,8 +21,13 @@ const adSchema = new mongoose.Schema({
     return query.exec();
   }
 
+  /* lista de tags permitidos
+  */
+ adSchema.statics.listTags = function () {
+   return ['work', 'lifestyle', 'motor', 'mobile'];
+ };
   
   
-const Ad = mongoose.model("Ad", adSchema)
+const Ad = mongoose.model("Anuncio", adSchema)
 
 module.exports = Ad;
