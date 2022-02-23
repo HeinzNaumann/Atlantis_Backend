@@ -42,17 +42,17 @@ router.get("/", /*jwtAuth*/ async (req, res, next) =>{
 
         const filter = {};
         if(name){
-            filter.name = name;
+            filter.nombre = name;
         }
         if(price){
-            filter.price = price;
+            filter.precio = price;
         }
         if(tag){
-            filter.tag = tag;
+            filter.tags = tag;
         }
 
         const anuncios = await Anuncio.lista(filter, skip, limit, select, sort);
-        //console.log("AQUI", anuncios)
+        //console.log("ANUNCIOS", anuncios)
         res.json({ results: anuncios });
     }catch (err){
         next(err)
@@ -138,6 +138,16 @@ router.put("/:id", async (req, res, next) =>{
         next(err)
     }
 })
+
+// /api/ads/tags 
+//Lista de anuncios
+/*
+router.get('/tags',function(req, res){
+    //tgs = Anuncio.listTags();
+    console.log("Entra en tags");
+    res.json({ result: "Tags" });
+});
+*/
 
 
 module.exports = router;
