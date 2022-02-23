@@ -3,6 +3,9 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+const LoginController = require('./controllers/loginController')
+const jwtAuth = require('./lib/jwtAuthMiddleware')
+
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
@@ -25,8 +28,12 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 
+const loginController = new LoginController();
 //Rutas del API
 app.use("/api/ads/", require("./routes/api/ads"));
+app.use("/users", require("./routes/users") )
+app.post('/api/auth', loginController.postJWT)
+
 
 
 
@@ -37,6 +44,7 @@ app.use(function (req, res, next) {
 
 //setup i18n
 const i18n = require("./lib/i18n");
+const { log } = require("console");
 app.use(i18n.init);
 
 console.log(i18n.__("hello world"));

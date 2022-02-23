@@ -45,7 +45,7 @@ class LoginController {
         })
       }
     
-    // POST /api/login
+    // POST /api/auth
     async postJWT(req, res, next) {
         try {
           const { email, password } = req.body;
