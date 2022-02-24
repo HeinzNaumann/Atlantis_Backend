@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
-const {Usuario} = require('../models')
-const jwtAuthMiddleware = require('../lib/jwtAuthMiddleware')
+const {Usuario} = require('../../models')
+const jwtAuthMiddleware = require('../../lib/jwtAuthMiddleware')
 const bcrypt = require('bcrypt');
 /* GET users listing. */
 router.get('/', function(req, res, next) {

@@ -3,14 +3,15 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+const cors = require('cors');
 const LoginController = require('./controllers/loginController')
 const jwtAuth = require('./lib/jwtAuthMiddleware')
 
-
 var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
+var usersRouter = require("./routes/api/users");
 
 var app = express();
+app.use(cors());
 
 //Connection to the data base
 require("./lib/connectMongoose");
@@ -31,7 +32,7 @@ app.use("/users", usersRouter);
 const loginController = new LoginController();
 //Rutas del API
 app.use("/api/ads/", require("./routes/api/ads"));
-app.use("/users", require("./routes/users") )
+app.use("/api/users", require("./routes/api/users") )
 app.post('/api/auth', loginController.postJWT)
 
 
