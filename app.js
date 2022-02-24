@@ -30,6 +30,8 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 
 const loginController = new LoginController();
+
+
 //Rutas del API
 app.use("/api/ads/", require("./routes/api/ads"));
 app.use("/api/users", require("./routes/api/users") )

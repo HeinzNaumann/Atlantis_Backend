@@ -3,6 +3,8 @@ var router = express.Router();
 const {Usuario} = require('../../models')
 const jwtAuthMiddleware = require('../../lib/jwtAuthMiddleware')
 const bcrypt = require('bcrypt');
+
+
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   res.send('respond with a resource');
