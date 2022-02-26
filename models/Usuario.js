@@ -1,9 +1,9 @@
 'use strict';
 
 const mongoose = require('mongoose');
-//const nodemailer = require('nodemailer');
+const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
-//const emailTransportConfigure = require('../lib/emailTransportConfigure');
+const emailTransportConfigure = require('../lib/emailTransportConfigure')
 
 // creo el esquema
 const usuarioSchema = mongoose.Schema({
@@ -22,7 +22,7 @@ usuarioSchema.methods.comparePassword = function(passwordEnClaro) {
   return bcrypt.compare(passwordEnClaro, this.password);
 }
 
-/*
+
 usuarioSchema.methods.enviarEmail = async function(asunto, cuerpo) {
 
   const transport = await emailTransportConfigure();
@@ -39,7 +39,7 @@ usuarioSchema.methods.enviarEmail = async function(asunto, cuerpo) {
 
   return result;
 
-}  */
+}  
 
 // creo el modelo
 const Usuario = mongoose.model('Usuario', usuarioSchema);
