@@ -42,6 +42,13 @@ router.post("/", async (req, res, next) =>{
 
       const createdUsuario = await usuario.save();
       console.log(createdUsuario)
+      // enviar email al usuario
+					const result = await usuario.enviarEmail(
+						"Registro de usuario",
+						"Bienvenido a Atlantis"
+					);
+					console.log("Mensaje enviado", result.messageId);
+					console.log("ver mensaje", result.getTestMessageUrl);
       res.status(201).json({ result: createdUsuario });
 
   } catch (err){

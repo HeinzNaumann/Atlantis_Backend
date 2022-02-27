@@ -73,22 +73,17 @@ class LoginController {
 						next(err);
 						return;
 					}
-					// enviar email al usuario
-					const result = await usuario.enviarEmail(
-						"Esto es el asunto",
-						"Bienvenido a Atlantis"
-					);
-					console.log("Mensaje enviado", result.messageId);
-					console.log("ver mensaje", result.getTestMessageUrl);
-
 					// devolver al cliente el token generado
 					res.json({ token: jwtToken });
 				}
 			);
+
 		} catch (err) {
 			next();
 		}
 	}
+
+
 }
 
 module.exports = LoginController;
