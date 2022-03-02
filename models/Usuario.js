@@ -22,6 +22,20 @@ usuarioSchema.methods.comparePassword = function(passwordEnClaro) {
   return bcrypt.compare(passwordEnClaro, this.password);
 }
 
+usuarioSchema.statics.notExistEmail = function(email){
+  const query = Usuario.find(email); 
+   //const res = await query.exec();
+   //console.log("ResE: ", res);
+  return query.exec();
+}
+
+usuarioSchema.statics.notExistName = function(nombre){
+  const query = Usuario.find(nombre); 
+   //const res = await query.exec();
+   //console.log("ResN: ", res);
+  return query.exec();
+}
+
 /*
 usuarioSchema.methods.enviarEmail = async function(asunto, cuerpo) {
 

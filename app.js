@@ -36,7 +36,7 @@ const loginController = new LoginController();
 app.use("/api/ads/",jwtAuth, require("./routes/api/ads"));
 app.use("/api/users", require("./routes/api/users") );
 app.post('/api/auth', loginController.postJWT);
-app.use('/api/logout', loginController.logout);
+app.use('/api/logout', jwtAuth, loginController.logout);
 
 
 

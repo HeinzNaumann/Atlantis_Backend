@@ -38,23 +38,12 @@ class LoginController {
 	}
 
     async logout(req, res, next) {
-     /*    req.session.regenerate(err => {
-          if (err) {
-            next(err);
-            return;
-          }
-          console.log("Logout",req.session);
-          //res.redirect('/');
-          res.json({ result: "Logout"});
-        }) */
 
         //poner el estado de conectado a true de ese usuario en la BD
-        //await Usuario.updateOne({ _id: {$eq: usuario._id}}, {$set: {conectado:true}} );
-        console.log("Logout ",req.session);
-        console.log("req.apiAuthUserId",req.apiAuthUserId)
-        //res.redirect('/');
-        res.json({ result: "Logout"});
-
+        // apiAuthUserId viene creado en el paso previo de verificar el token en jwtAuth antes pasar a logout
+        await Usuario.updateOne({ _id: {$eq: req.apiAuthUserId}}, {$set: {conectado:false}} );
+        res.redirect('/');
+       
       }
     
     // POST /api/auth

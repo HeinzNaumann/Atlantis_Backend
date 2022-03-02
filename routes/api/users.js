@@ -18,10 +18,12 @@ router.get('/', function(req, res, next) {
 
 
 router.delete('/:id', jwtAuthMiddleware, async (req, res, next)=> {
+ 
+  const _id = req.params.id;
 
   try {
     console.log(`El usuario ${_id} ha sido eliminado`);
-    await User.deleteOne({ _id: _id });
+    await Usuario.deleteOne({ _id: _id });
     res.json();
   } catch (error) {
     next(error);
@@ -31,15 +33,25 @@ router.delete('/:id', jwtAuthMiddleware, async (req, res, next)=> {
 router.post("/", async (req, res, next) =>{
     
   console.log("crear usuario");
+  //si existe el nombre o correo no se crea
+  const nombre ={'nombre':req.body.nombre}
+  const email ={'email': req.body.email}
+  const existeNombre = await Usuario.notExistName(nombre);
+  const existeEmail = await Usuario.notExistEmail(email);
+  
+  if((existeNombre.length>0) || (existeEmail.length>0)){
+    res.json({ result: "ya existe el email o nombre en el sistema", res1: existeNombre, res2:existeEmail });
+    return;
+  }
   try{
       const clave = await bcrypt.hash(req.body.password, 7)
       const usuarioData = {
         ...req.body, 
         password:clave
       };        
+      
 
       const usuario = new Usuario(usuarioData);
-
       const createdUsuario = await usuario.save();
       console.log(createdUsuario)
       res.status(201).json({ result: createdUsuario });
@@ -48,6 +60,41 @@ router.post("/", async (req, res, next) =>{
       next(err);
   }
 });
+
+
+//PUT /api/users:id (body)lo que quiero actualizar
+//Actualizar un usuario
+router.put("/:id", async (req, res, next) =>{
+  try{
+      
+      //console.log("Entra en PUT");
+      const _id = req.params.id;
+      const usuarioData = {...req.body}
+      //Si existe datos en el campo password sobrescribo usuarioData
+      if(req.body.password){
+          const clave = await bcrypt.hash(req.body.password, 7)
+          usuarioData = {
+            ...req.body, 
+            password:clave
+          };        
+      }
+      
+     // console.log("Body Req:", req.body);
+
+      const updatedUsuario = await Usuario.findOneAndUpdate({ _id: _id}, usuarioData, {
+          new: true
+      });
+
+      if(!updatedUsuario){
+          res.status(404).json({error: "not found"});
+          return;
+      }
+      res.json({ result: updatedUsuario });
+
+  }catch(err){
+      next(err)
+  }
+})
 
 
 module.exports = router;
