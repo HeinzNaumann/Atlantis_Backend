@@ -83,7 +83,8 @@ router.post("/", upload.single('imagen'),async (req, res, next) =>{
         const anuncioData = {
           ...req.body,
           //image: req.file.path,
-         imagen: filename
+         imagen: filename,
+         usuario: req.apiAuthUserId
         };        
 
         const anuncio = new Anuncio(anuncioData);
@@ -122,7 +123,7 @@ router.put("/:id", async (req, res, next) =>{
         const anuncioData = req.body;
 
         //
-        console.log("Body Req:", req.body);
+       // console.log("Body Req:", req.body);
 
         const updatedAnuncio = await Anuncio.findOneAndUpdate({ _id: _id}, anuncioData, {
             new: true
