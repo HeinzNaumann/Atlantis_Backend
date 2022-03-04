@@ -8,7 +8,6 @@ const path = require('path');
 //TODO
 //Borrar imagenes con el delete, posibles problema con permisos en servidor
 //actualizar con PUT
-//capturar ID de usuario al crear anuncio generado en jwtAuthMiddleware antes de las peticiones (req.apiAuthUserId)
 
 
 //Multer
