@@ -26,6 +26,18 @@ const adSchema = new mongoose.Schema({
  adSchema.statics.listTags = function () {
    return ['work', 'lifestyle', 'motor', 'mobile'];
  };
+
+ adSchema.statics.deleteAdsByUser = function (id) {
+  let i=0;
+  const query = Ad.find({ usuario: id});
+  query.exec().then( result =>{
+    result.forEach(
+      async element=> {await Ad.deleteOne({_id: element._id})
+      i=i+1;}
+    )
+  })
+  return i;
+};
   
   
 const Ad = mongoose.model("Anuncio", adSchema)

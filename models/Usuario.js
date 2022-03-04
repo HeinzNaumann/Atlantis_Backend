@@ -1,5 +1,8 @@
 'use strict';
 
+// TODO:
+// verificar que si no existe el usuario el error es que no existe usuario
+
 const mongoose = require('mongoose');
 //const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
@@ -34,6 +37,32 @@ usuarioSchema.statics.notExistName = function(nombre){
    //const res = await query.exec();
    //console.log("ResN: ", res);
   return query.exec();
+}
+
+usuarioSchema.statics.updateFav = async function(usuario,fav){
+
+  // buscar el usuario en la base de datos
+  const user = await Usuario.findOne({ _id:usuario });
+  let arrayFavs = [...user.favs];
+  let res=[];
+  // si existe ese anuncio en favoritos se elimina
+  if(arrayFavs.filter(element=>element === fav).length>0){
+     res = arrayFavs.filter(element=>element !== fav);
+  }else{ // si no existe lo añado
+     res = [...arrayFavs,fav];
+  }
+
+  // actualizo la BD con el nuevo array de fav de ese usuario
+  const usuarioData = { favs: res }
+  const updatedUsuario = await Usuario.findOneAndUpdate({ _id: usuario}, usuarioData, {
+    new: true
+  });
+
+   if(!updatedUsuario){
+        //res.status(404).json({error: "not found"});
+        return res="Error al actualizar favoritos";
+    }
+  return res; 
 }
 
 /*

@@ -1,15 +1,15 @@
 var express = require('express');
 var router = express.Router();
-const {Usuario} = require('../../models')
-const jwtAuthMiddleware = require('../../lib/jwtAuthMiddleware')
+const {Usuario, Anuncio} = require('../../models')
+const jwtAuth = require('../../lib/jwtAuthMiddleware')
 const bcrypt = require('bcrypt');
 
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
+/* router.get('/', function(req, res, next) {
   res.send('respond with a resource');
 });
-
+ */
 
 /**
 * DELETE user
@@ -17,13 +17,18 @@ router.get('/', function(req, res, next) {
 */
 
 
-router.delete('/:id', jwtAuthMiddleware, async (req, res, next)=> {
+router.delete('/:id', jwtAuth, async (req, res, next)=> {
  
   const _id = req.params.id;
 
   try {
     console.log(`El usuario ${_id} ha sido eliminado`);
     await Usuario.deleteOne({ _id: _id });
+    
+    //Borrar anuncios del usuario
+    await Anuncio.deleteAdsByUser(_id);
+    //console.log(`Se han eliminado ${ads} anuncios`);
+
     res.json();
   } catch (error) {
     next(error);
@@ -40,7 +45,7 @@ router.post("/", async (req, res, next) =>{
   const existeEmail = await Usuario.notExistEmail(email);
   
   if((existeNombre.length>0) || (existeEmail.length>0)){
-    res.json({ result: "ya existe el email o nombre en el sistema", res1: existeNombre, res2:existeEmail });
+    res.json({ result: "ya existe el email o nombre en el sistema" });
     return;
   }
   try{
@@ -53,7 +58,7 @@ router.post("/", async (req, res, next) =>{
 
       const usuario = new Usuario(usuarioData);
       const createdUsuario = await usuario.save();
-      console.log(createdUsuario)
+     // console.log(createdUsuario)
       res.status(201).json({ result: createdUsuario });
 
   } catch (err){
@@ -65,12 +70,25 @@ router.post("/", async (req, res, next) =>{
 //PUT /api/users:id (body)lo que quiero actualizar
 //Actualizar un usuario
 router.put("/:id", async (req, res, next) =>{
-  try{
+  
+   try{
+      //si existe el nombre o correo no se actualiza
+      if(req.body.nombre || req.body.email){
+          const nombre ={'nombre':req.body.nombre}
+          const email ={'email': req.body.email}
+          const existeNombre = await Usuario.notExistName(nombre);
+          const existeEmail = await Usuario.notExistEmail(email);
+          
+          if((existeNombre.length>0) || (existeEmail.length>0)){
+            res.json({ result: "ya existe el email o nombre en el sistema", res1: existeNombre, res2:existeEmail });
+            return;
+          }
+       }
       
       //console.log("Entra en PUT");
       const _id = req.params.id;
-      const usuarioData = {...req.body}
-      //Si existe datos en el campo password sobrescribo usuarioData
+      let usuarioData = {...req.body}
+      //Si existe datos en el campo password sobrescribo usuarioData con pass encriptada
       if(req.body.password){
           const clave = await bcrypt.hash(req.body.password, 7)
           usuarioData = {
@@ -94,7 +112,23 @@ router.put("/:id", async (req, res, next) =>{
   }catch(err){
       next(err)
   }
-})
+});
+
+//GET /api/users?fav 
+//Añadir o eliminar favoritos
+router.get("/", jwtAuth, async (req, res, next) =>{
+  try{
+    const fav = req.query.fav; // id anuncio fav 
+    const usuario = req.apiAuthUserId; // id usuario generado en jwtAuth
+    //console.log("req.apiAuthUserId", req.apiAuthUserId);
+    //console.log("fav", fav);
+    const arrayFavs = await Usuario.updateFav(usuario, fav);
+    res.json({ result: arrayFavs});
+  }catch(err){
+    next(err)
+  }
+});
+
 
 
 module.exports = router;

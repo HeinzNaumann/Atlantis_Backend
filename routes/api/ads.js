@@ -37,6 +37,7 @@ router.get("/", /*jwtAuth*/ async (req, res, next) =>{
         const select = req.query.select; // campos
         const sort = req.query.sort;
         //const start = parseInt(req.query.start) || 0;
+        const user = req.query.user; // para filtrar por anuncios de ese usuario
 
         
 
@@ -49,6 +50,9 @@ router.get("/", /*jwtAuth*/ async (req, res, next) =>{
         }
         if(tag){
             filter.tags = tag;
+        }
+        if(user){
+            filter.usuario = user;
         }
 
         const anuncios = await Anuncio.lista(filter, skip, limit, select, sort);
@@ -80,6 +84,7 @@ router.post("/", upload.single('imagen'),async (req, res, next) =>{
     console.log("Entra en API POST");
     try{
         const filename =req.file.filename;
+        //console.log("req.apiAuthUserId", req.apiAuthUserId);
         const anuncioData = {
           ...req.body,
           //image: req.file.path,
