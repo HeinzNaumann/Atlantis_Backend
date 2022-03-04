@@ -80,7 +80,7 @@ router.put("/:id", async (req, res, next) =>{
           const existeEmail = await Usuario.notExistEmail(email);
           
           if((existeNombre.length>0) || (existeEmail.length>0)){
-            res.json({ result: "ya existe el email o nombre en el sistema", res1: existeNombre, res2:existeEmail });
+            res.json({ result: "ya existe el email o nombre en el sistema"});
             return;
           }
        }
