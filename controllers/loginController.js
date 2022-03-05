@@ -51,11 +51,17 @@ class LoginController {
         try {
           const { nombre, password } = req.body;
 
-          // buscar el usuario en la BD
+           // buscar el usuario en la BD
           const usuario = await Usuario.findOne({ nombre });
     
-          // si no lo encuentro o no coincide la contraseña --> error
-          if (!usuario || !(await usuario.comparePassword(password))) {
+          // si no lo encuentro el usuario en el sistema --> error
+          if (!usuario) {
+            res.json({ error: 'No existe ese usuario en el sistema' });
+            return;
+          }
+
+           // si lo encuentro pero no coincide la contraseña --> error
+           if (!await usuario.comparePassword(password)) {
             res.json({ error: 'Invalid credentials' });
             return;
           }
