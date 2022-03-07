@@ -66,6 +66,20 @@ router.post("/", async (req, res, next) =>{
   }
 });
 
+// /api/users:id
+//metodo para obtener un usuario
+router.get("/:identificador", async (req, res, next) =>{
+  try{
+      const _id = req.params.identificador;
+
+      const usuario = await Usuario.find({_id: _id});
+      // recuperar los anuncios fav del usuario antes de devolver los datos del usuario
+      res.json({ result: usuario });
+  }catch(err){
+      next (err);
+  }
+});
+
 
 //PUT /api/users:id (body)lo que quiero actualizar
 //Actualizar un usuario

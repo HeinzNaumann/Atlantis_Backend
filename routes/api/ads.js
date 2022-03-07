@@ -7,7 +7,10 @@ const path = require('path');
 
 //TODO
 //Borrar imagenes con el delete, posibles problema con permisos en servidor
-//actualizar con PUT
+//actualizar con PUT la imagen
+//validar borrar anuncio solo si es propietario del mismo
+//Marcar/desmarcar reservadp y vendido
+//ver anuncios favoritos del usuario
 
 
 //Multer
@@ -89,8 +92,8 @@ router.post("/", upload.single('imagen'),async (req, res, next) =>{
           //image: req.file.path,
          imagen: filename,
          usuario: req.apiAuthUserId
-        };        
-
+        };
+        
         const anuncio = new Anuncio(anuncioData);
 
         const createdAnuncio = await anuncio.save();
@@ -108,9 +111,15 @@ router.delete("/:id", async (req, res, next) =>{
     try{
 
         const _id = req.params.id;
-
-        await Anuncio.deleteOne({ _id: _id});
-        res.json();
+       
+        const anuncio = await Anuncio.findOne({_id: _id});
+        //Si el propietario del anuncio es quien hace la pet de borrado
+        if(anuncio.usuario === req.apiAuthUserId){
+            await Anuncio.deleteOne({ _id: _id});
+            res.json();
+        }else{
+            res.json({result: "Debe ser propietario del anuncio para borrarlo"});
+        }
 
     }catch(err){
         next(err)
@@ -126,8 +135,32 @@ router.put("/:id", async (req, res, next) =>{
         const _id = req.params.id;
         const anuncioData = req.body;
 
-        //
-       // console.log("Body Req:", req.body);
+        //Si es una peticion de actualizar campo reservado
+        console.log("res: ", req.query.res)
+        if(req.query.res === "true"){
+            await Anuncio.updateOne({ _id: {$eq:_id}}, {$set: {reservado:true}} );
+            res.json({result: "Anuncio reservado"});
+            return;
+        }
+        if(req.query.res === "false"){
+            await Anuncio.updateOne({ _id: {$eq:_id}}, {$set: {reservado:false}});
+            res.json({result: "Anuncio disponible"});
+            return;
+        }
+        //Si es una peticion de actualizar campo vendido
+        if(req.query.vend === "true"){
+            await Anuncio.updateOne({ _id: {$eq:_id}}, {$set: {vendido:true}} );
+            res.json({result: "Anuncio vendido"});
+            return;
+        }
+        if(req.query.vend === "false"){
+            await Anuncio.updateOne({ _id: {$eq:_id}}, {$set: {vendido:false}});
+            res.json({result: "Anuncio en venta"});
+            return;
+        }
+
+
+
 
         const updatedAnuncio = await Anuncio.findOneAndUpdate({ _id: _id}, anuncioData, {
             new: true
