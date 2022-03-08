@@ -1,7 +1,9 @@
 "use strict";
 
-const jwt = require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
 const { Usuario } = require("../models");
+const nodemailer = require("nodemailer");
+const emailTransportConfigure = require("../lib/emailTransportConfigure");
 
 class LoginController {
 	index(req, res, next) {
@@ -30,12 +32,12 @@ class LoginController {
 			req.session.usuarioLogado = {
 				_id: usuario._id,
 			};
-			//res.redirect("/privado");
 
 		} catch (err) {
 			next(err);
 		}
 	}
+
 
     async logout(req, res, next) {
 
@@ -88,6 +90,7 @@ class LoginController {
         }
       }
     
+
 }
 
 module.exports = LoginController;
