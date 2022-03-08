@@ -134,10 +134,20 @@ router.get("/", jwtAuth, async (req, res, next) =>{
   try{
     const fav = req.query.fav; // id anuncio fav 
     const usuario = req.apiAuthUserId; // id usuario generado en jwtAuth
-    //console.log("req.apiAuthUserId", req.apiAuthUserId);
-    //console.log("fav", fav);
-    const arrayFavs = await Usuario.updateFav(usuario, fav);
-    res.json({ result: arrayFavs});
+    const favs = req.query.favs; // si peticion ads favoritos
+    // si es una petición de añadir/eliminar fav
+    if(fav){
+      const arrayFavs = await Usuario.updateFav(usuario, fav);
+      res.json({result: arrayFavs});
+    }
+    // si es una peticion de ver favoritos del usuario
+    if(favs === "true"){
+      const arrayf = await Usuario.findOne({_id:usuario});
+      const arrayFavs = [...arrayf.favs];
+      const adsFavs = await Anuncio.adsFavs(arrayFavs);
+      res.json({ result: adsFavs});
+    }
+
   }catch(err){
     next(err)
   }

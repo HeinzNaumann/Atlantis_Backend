@@ -136,7 +136,7 @@ router.put("/:id", async (req, res, next) =>{
         const anuncioData = req.body;
 
         //Si es una peticion de actualizar campo reservado
-        console.log("res: ", req.query.res)
+        //console.log("res: ", req.query.res)
         if(req.query.res === "true"){
             await Anuncio.updateOne({ _id: {$eq:_id}}, {$set: {reservado:true}} );
             res.json({result: "Anuncio reservado"});

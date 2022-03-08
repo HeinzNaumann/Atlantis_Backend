@@ -38,6 +38,17 @@ const adSchema = new mongoose.Schema({
   })
   return i;
 };
+
+adSchema.statics.adsFavs = async function(arrayFav){
+  let adsfavs=[];
+  let i=0;
+  while (i<arrayFav.length) {
+    const ad = await Ad.findOne({ _id: arrayFav[i]});
+    adsfavs.push(ad); 
+    i++;
+  }
+  return adsfavs;
+}
   
   
 const Ad = mongoose.model("Anuncio", adSchema)
