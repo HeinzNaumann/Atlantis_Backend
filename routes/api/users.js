@@ -61,9 +61,11 @@ router.post("/", async (req, res, next) =>{
 
       console.log(createdUsuario)
       // enviar email al usuario
-					const result = await usuario.enviarEmail(
+					const result = await Usuario.enviarEmail(
 						"Registro de usuario",
-						"Bienvenido a Atlantis"
+						"Bienvenido a Atlantis",
+            email
+            
 					);
 					console.log("Mensaje enviado", result.messageId);
 					console.log("ver mensaje", result.getTestMessageUrl);
@@ -142,9 +144,11 @@ router.put("/:id", async (req, res, next) =>{
 router.get("/", jwtAuth, async (req, res, next) =>{
   try{
     const fav = req.query.fav; // id anuncio fav 
-    const usuario = req.apiAuthUserId; // id usuario generado en jwtAuth
+    //console.log('fav', fav)
+    const usuario = req.apiAuthUserId;
     const favs = req.query.favs; // si peticion ads favoritos
     // si es una petición de añadir/eliminar fav
+    //console.log(usuario)
     if(fav){
       const arrayFavs = await Usuario.updateFav(usuario, fav);
       res.json({result: arrayFavs});

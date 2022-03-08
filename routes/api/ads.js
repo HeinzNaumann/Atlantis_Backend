@@ -4,6 +4,7 @@ const Anuncio = require("../../models/Anuncio.js");
 //const jwtAuth = require("../../lib/jwtAuthMiddleware");
 const multer = require("multer");
 const path = require("path");
+const notification = require('../../controllers/notificationContoller')
 
 //TODO
 //Borrar imagenes con el delete, posibles problema con permisos en servidor
@@ -168,6 +169,7 @@ router.put("/:id", async (req, res, next) => {
         { _id: { $eq: _id } },
         { $set: { vendido: true } }
       );
+      notification(_id)
       res.json({ result: "Anuncio vendido" });
       return;
     }

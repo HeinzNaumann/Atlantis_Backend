@@ -67,14 +67,14 @@ usuarioSchema.statics.updateFav = async function(usuario,fav){
 }
 
 
-usuarioSchema.methods.enviarEmail = async function(asunto, cuerpo) {
+usuarioSchema.statics.enviarEmail = async function(asunto, cuerpo, email) {
 
   const transport = await emailTransportConfigure();
 
   // enviar el email
   const result = await transport.sendMail({
     from: process.env.EMAIL_SERVICE_FROM,
-    to: this.email,
+    to: email,
     subject: asunto,
     html: cuerpo
   });
