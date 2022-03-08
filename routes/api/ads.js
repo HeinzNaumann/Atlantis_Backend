@@ -196,7 +196,7 @@ router.put("/:id", async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-  res.json({ result: updatedAnuncio });
+  //res.json({ result: '-1' });
 });
 
 // /api/ads/tags
