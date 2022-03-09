@@ -93,7 +93,7 @@ router.post("/", async (req, res, next) =>{
 
  
   if((existeNombre.length>0) || (existeEmail.length>0)){
-    res.json({ result: "ya existe el email o nombre en el sistema" });
+    res.json({ msg: "Name or Email allready exits in our system, pleaser try with another one." });
     return;
   }
   try{
@@ -106,19 +106,8 @@ router.post("/", async (req, res, next) =>{
 
       const usuario = new Usuario(usuarioData);
       const createdUsuario = await usuario.save();
-
-      console.log(createdUsuario)
-      // enviar email al usuario
-					const result = await Usuario.enviarEmail(
-						"Registro de usuario",
-						"Bienvenido a Atlantis",
-            usuario.email
-            
-					);
-					console.log("Mensaje enviado", result.messageId);
-					console.log("ver mensaje", result.getTestMessageUrl);
-
-      res.status(201).json({ result: createdUsuario });
+     // console.log(createdUsuario)
+         res.status(201).json({ result: createdUsuario, msg: "User created succesfully" });
 
   } catch (err){
       next(err);
@@ -192,11 +181,9 @@ router.put("/:id", async (req, res, next) =>{
 router.get("/", jwtAuth, async (req, res, next) =>{
   try{
     const fav = req.query.fav; // id anuncio fav 
-    //console.log('fav', fav)
-    const usuario = req.apiAuthUserId;
+    const usuario = req.apiAuthUserId; // id usuario generado en jwtAuth
     const favs = req.query.favs; // si peticion ads favoritos
     // si es una petición de añadir/eliminar fav
-    //console.log(usuario)
     if(fav){
       const arrayFavs = await Usuario.updateFav(usuario, fav);
       res.json({result: arrayFavs});
