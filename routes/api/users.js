@@ -64,7 +64,7 @@ router.post("/", async (req, res, next) =>{
 					const result = await Usuario.enviarEmail(
 						"Registro de usuario",
 						"Bienvenido a Atlantis",
-            email
+            usuario.email
             
 					);
 					console.log("Mensaje enviado", result.messageId);
