@@ -38,12 +38,60 @@ router.delete('/:id', jwtAuth, async (req, res, next)=> {
 router.post("/", async (req, res, next) =>{
     
   console.log("crear usuario");
+
+    //para recuperar contraseña del usuario que solo envia nombre
+  if(req.body.nombre && !req.body.email && !req.body.password){
+    const nombre ={'nombre':req.body.nombre}
+    const resu =await Usuario.notExistName(nombre);
+    const user =resu[0];
+
+   
+     if(user.length === 0){
+      res.json({ result: "No existe un usuario con ese nombre en el sistema" });
+      return;
+     }
+     //generamos una clave aleatoria
+     const clave = Math.random().toString(36).slice(2) + Math.random().toString(36).toUpperCase().slice(2);
+     //actualizamos la contraseña en la BD
+      const pass = await bcrypt.hash(clave, 7)
+      const userUpdate= await Usuario.updateOne({ _id: {$eq: user._id}}, {$set: {password:pass}} );
+      
+      //console.log("Usuario ACTU:",userUpdate);
+
+      if(!userUpdate){
+         res.json({ result: "No se ha podido procesar el reseteo de clave, vuelva a intentarlo" });
+         return;
+      }
+
+    // enviar email al usuario
+    const result = await Usuario.enviarEmail(
+      "Recuperación de clave - Atlantis",
+      `Hola ${nombre.nombre}, su nueva clave de acceso es: ${clave}`,
+       user.email      
+     );
+     console.log("CLAVE", clave);
+     console.log("Mensaje enviado", result.messageId);
+
+     if(result.messageId){
+      res.json({ result: "Se ha enviado un correo con su nueva clave" });
+      return;
+     }
+
+  }
+
+  //si no envia todos los datos obligatorios para el registro
+  if(!req.body.nombre || !req.body.email || !req.body.password){
+    res.json({ result: "Los campos nombre, email y contraseña son obligatorios" });
+    return;
+  }
+
   //si existe el nombre o correo no se crea
   const nombre ={'nombre':req.body.nombre}
   const email ={'email': req.body.email}
   const existeNombre = await Usuario.notExistName(nombre);
   const existeEmail = await Usuario.notExistEmail(email);
-  
+
+ 
   if((existeNombre.length>0) || (existeEmail.length>0)){
     res.json({ result: "ya existe el email o nombre en el sistema" });
     return;
