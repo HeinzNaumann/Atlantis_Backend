@@ -45,7 +45,7 @@ router.post("/", async (req, res, next) =>{
   const existeEmail = await Usuario.notExistEmail(email);
   
   if((existeNombre.length>0) || (existeEmail.length>0)){
-    res.json({ result: "Name or Email allready exits in our system, pleaser try with another one." });
+    res.json({ msg: "Name or Email allready exits in our system, pleaser try with another one." });
     return;
   }
   try{
@@ -57,9 +57,9 @@ router.post("/", async (req, res, next) =>{
       
 
       const usuario = new Usuario(usuarioData);
-       await usuario.save();
+      const createdUsuario = await usuario.save();
      // console.log(createdUsuario)
-         res.status(201).json({ msg: "User created succesfully" });
+         res.status(201).json({ result: createdUsuario, msg: "User created succesfully" });
 
   } catch (err){
       next(err);
