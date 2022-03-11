@@ -58,13 +58,13 @@ class LoginController {
     
           // si no lo encuentro el usuario en el sistema --> error
           if (!usuario) {
-            res.json({ error: 'No existe ese usuario en el sistema' });
+            res.json({ msg:"User doesnt exist" });
             return;
           }
 
            // si lo encuentro pero no coincide la contraseña --> error
            if (!await usuario.comparePassword(password)) {
-            res.json({ error: 'Invalid credentials' });
+            res.json({ msg: "Password not correct"});
             return;
           }
     
