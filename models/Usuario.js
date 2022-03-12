@@ -4,9 +4,9 @@
 // verificar que si no existe el usuario el error es que no existe usuario
 
 const mongoose = require('mongoose');
-//const nodemailer = require('nodemailer');
+const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
-//const emailTransportConfigure = require('../lib/emailTransportConfigure');
+const emailTransportConfigure = require('../lib/emailTransportConfigure');
 
 // creo el esquema
 const usuarioSchema = mongoose.Schema({
@@ -65,15 +65,15 @@ usuarioSchema.statics.updateFav = async function(usuario,fav){
   return res; 
 }
 
-/*
-usuarioSchema.methods.enviarEmail = async function(asunto, cuerpo) {
+
+ usuarioSchema.statics.enviarEmail = async function(asunto, cuerpo, email) {
 
   const transport = await emailTransportConfigure();
 
   // enviar el email
   const result = await transport.sendMail({
     from: process.env.EMAIL_SERVICE_FROM,
-    to: this.email,
+    to: email,
     subject: asunto,
     html: cuerpo
   });
@@ -82,7 +82,7 @@ usuarioSchema.methods.enviarEmail = async function(asunto, cuerpo) {
 
   return result;
 
-}  */
+}  
 
 // creo el modelo
 const Usuario = mongoose.model('Usuario', usuarioSchema);

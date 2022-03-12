@@ -53,6 +53,11 @@ class LoginController {
         try {
           const { nombre, password } = req.body;
 
+          if (!nombre || !password) {
+            res.json({ msg: "Name and password are required"});
+            return;
+          }
+
            // buscar el usuario en la BD
           const usuario = await Usuario.findOne({ nombre });
     
@@ -63,7 +68,7 @@ class LoginController {
           }
 
            // si lo encuentro pero no coincide la contraseña --> error
-           if (!await usuario.comparePassword(password)) {
+          if (!await usuario.comparePassword(password)) {
             res.json({ msg: "Password not correct"});
             return;
           }

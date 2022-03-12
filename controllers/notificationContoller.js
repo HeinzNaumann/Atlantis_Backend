@@ -9,7 +9,7 @@ module.exports = async function notification(idanuncio) {
         favs: {$in: [idanuncio]}
     })
     usersWithFav.forEach(async (e) => {
-        console.log('usuarios con favoritos',e)
+        //console.log('usuarios con favoritos',e)
 
         // Mandar email a cada usuario
         const result = await Usuario.enviarEmail(
