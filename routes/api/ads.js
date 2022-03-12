@@ -39,7 +39,6 @@ router.get(
       const limit = parseInt(req.query.limit) || 1000; // nuestro api devuelve max 1000 registros;
       const select = req.query.select; // campos
       const sort = req.query.sort;
-      const offset = req.query.offset;
       //const start = parseInt(req.query.start) || 0;
       const user = req.query.user; // para filtrar por anuncios de ese usuario
 
@@ -57,7 +56,7 @@ router.get(
         filter.usuario = user;
       }
 
-      const anuncios = await Anuncio.lista(filter, skip, limit, select, sort, offset);
+      const anuncios = await Anuncio.lista(filter, skip, limit, select, sort);
       //console.log("ANUNCIOS", anuncios)
       res.json({ results: anuncios, totalads: anuncios.length });
     } catch (err) {

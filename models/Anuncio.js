@@ -10,9 +10,10 @@ const adSchema = new mongoose.Schema({
   reservado: { type: Boolean },
   vendido: { type: Boolean },
   usuario: { type: String, index: true },
+  createdAt: { type: Date, default: Date.now }
 });
 
-  adSchema.statics.lista = function(filtro, skip, limit, select, sort, offset) {
+  adSchema.statics.lista = function(filtro, skip, limit, select, sort) {
     const query = Ad.find(filtro); 
     query.skip(skip);
     query.limit(limit);
