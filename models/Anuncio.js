@@ -12,12 +12,13 @@ const adSchema = new mongoose.Schema({
   usuario: { type: String, index: true },
 });
 
-  adSchema.statics.lista = function(filtro, skip, limit, select, sort) {
+  adSchema.statics.lista = function(filtro, skip, limit, select, sort, offset) {
     const query = Ad.find(filtro); 
     query.skip(skip);
     query.limit(limit);
     query.select(select);
     query.sort(sort);
+    query.offset(offset);
     return query.exec();
   }
 
