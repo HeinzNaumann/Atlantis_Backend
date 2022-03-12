@@ -19,7 +19,7 @@ const adSchema = new mongoose.Schema({
     query.limit(limit);
     query.select(select);
     query.sort(sort);
-    query.offset(offset);
+    
     return query.exec();
   }
 
