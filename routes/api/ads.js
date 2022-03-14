@@ -19,7 +19,8 @@ const storage = multer.diskStorage({
     cb(null, path.join(__dirname, "../../public/images/anuncios"));
   },
   filename: function (req, file, cb) {
-    cb(null, file.fieldname + Date.now(), file.originalname);
+   // cb(null, file.fieldname + Date.now(), file.originalname);
+   cb(null, file.originalname)
   },
 });
 
@@ -99,7 +100,7 @@ router.post("/", upload.single("imagen"), async (req, res, next) => {
 
   console.log("Entra en API POST");
   try {
-    const filename = req.file.filename;
+    const filename = req.file? req.file.filename: "imagen_generica";
     //console.log("req.apiAuthUserId", req.apiAuthUserId);
     const anuncioData = {
       ...req.body,
