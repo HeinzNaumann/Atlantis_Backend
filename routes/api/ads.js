@@ -100,7 +100,6 @@ router.post("/", upload.single("imagen"), jwtAuth, async (req, res, next) => {
   //console.log("req.apiAuthUserId", req.apiAuthUserId);
   //busca el usuario el nombre del usuario para insertarlo
   user = await Usuario.findById({_id:req.apiAuthUserId});
-  console.log("User--->",user);
 
   console.log("Entra en API POST");
 

@@ -13,7 +13,7 @@ const chatSchema = mongoose.Schema({
   propietario_nombre: { type: String },
   usuario_int: { type: String, index: true },
   usuario_int_nombre: { type: String, index: true },
-  mensajes: { type: [String] },
+  mensajes: { type: [{nombre:{type: String},mensaje:{type: String},createdAtMsg: { type: Date, default: Date.now }}] },
   createdAt: { type: Date, default: Date.now }
 });
 

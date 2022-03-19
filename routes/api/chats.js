@@ -8,15 +8,18 @@ const bcrypt = require('bcrypt');
 router.post("/", async (req, res, next) =>{
     
   console.log("crear chat");
+  console.log("Body", req.body);
+  const date= Date.now ;
 
   try{
       const chatData = {
-        ...req.body
+        ...req.body,
+        mensajes:[{nombre:req.body.nombre, mensaje: req.body.mensaje, createAtMsg: date }]
       };        
       
 
       const chat = new Chat(chatData);
-      const createdChat = await Chat.save();
+      const createdChat = await chat.save();
 
       // enviar email al usuario
 /* 			const result = await Usuario.enviarEmail(
@@ -31,7 +34,7 @@ router.post("/", async (req, res, next) =>{
           
 				//	console.log("ver mensaje", result.getTestMessageUrl);
      // console.log(createdUsuario)
-         res.status(201).json({ msg: "User created succesfully", chat: createdChat });
+         res.status(201).json({ msg: "Chat created succesfully", chat: createdChat });
 
   } catch (err){
       next(err);
