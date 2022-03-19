@@ -10,6 +10,7 @@ const adSchema = new mongoose.Schema({
   reservado: { type: Boolean },
   vendido: { type: Boolean },
   usuario: { type: String, index: true },
+  usuario_nombre: { type: String, index: true },
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -50,6 +51,16 @@ adSchema.statics.adsFavs = async function(arrayFav){
     i++;
   }
   return adsfavs;
+}
+
+adSchema.statics.UpdateUserName = function(iduser,newname){
+
+  const query = Ad.find({ usuario: iduser});
+  query.exec().then( result =>{
+    result.forEach(
+      async element=> {await Ad.updateOne({ _id: {$eq: element._id}}, {$set: {usuario_nombre:newname}});}
+    )
+  })
 }
   
   

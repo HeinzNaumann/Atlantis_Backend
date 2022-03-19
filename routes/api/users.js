@@ -108,13 +108,16 @@ router.post("/", async (req, res, next) =>{
       const createdUsuario = await usuario.save();
 
       // enviar email al usuario
-			const result = await Usuario.enviarEmail(
+/* 			const result = await Usuario.enviarEmail(
 						"Registro de usuario",
 						"Bienvenido a Atlantis",
             usuario.email
             
 			);
-					console.log("Mensaje enviado", result.messageId);
+					console.log("Mensaje enviado", result.messageId); */
+
+
+          
 				//	console.log("ver mensaje", result.getTestMessageUrl);
      // console.log(createdUsuario)
          res.status(201).json({ msg: "User created succesfully" });
@@ -128,11 +131,19 @@ router.post("/", async (req, res, next) =>{
 //metodo para obtener un usuario
 router.get("/:identificador", async (req, res, next) =>{
   try{
-      const _id = req.params.identificador;
-
-      const usuario = await Usuario.find({_id: _id});
+      const user = req.params.identificador;
+      let usuario="";
+      if (user.match(/^[0-9a-fA-F]{24}$/)) {
+        // Yes, it's a valid ObjectId, proceed with `findById` call.
+          usuario = await Usuario.find({_id: user});
+      }
+      const usuario2 = await Usuario.find({nombre: user});
+      if(usuario || usuario2){
       // recuperar los anuncios fav del usuario antes de devolver los datos del usuario
-      res.json({ result: usuario });
+          res.json({ result: usuario || usuario2 });
+       }else{
+           res.json({ result: "null" });
+       }
   }catch(err){
       next (err);
   }
@@ -141,8 +152,9 @@ router.get("/:identificador", async (req, res, next) =>{
 
 //PUT /api/users:id (body)lo que quiero actualizar
 //Actualizar un usuario
-router.put("/:id", async (req, res, next) =>{
+router.put("/:id", jwtAuth, async (req, res, next) =>{
   
+   console.log("Entra en PUT");
    try{
       //si existe el nombre o correo no se actualiza
       if(req.body.nombre || req.body.email){
@@ -157,6 +169,7 @@ router.put("/:id", async (req, res, next) =>{
           }
        }
       
+
       //console.log("Entra en PUT");
       const _id = req.params.id;
       let usuarioData = {...req.body}
@@ -174,6 +187,10 @@ router.put("/:id", async (req, res, next) =>{
       const updatedUsuario = await Usuario.findOneAndUpdate({ _id: _id}, usuarioData, {
           new: true
       });
+       // actualizo usuario_nombre en los anuncios de los usuarios
+      if(updatedUsuario && req.body.nombre){
+         await Anuncio.UpdateUserName(_id,req.body.nombre);
+      }
 
       if(!updatedUsuario){
           res.status(404).json({error: "not found"});
@@ -210,7 +227,6 @@ router.get("/", jwtAuth, async (req, res, next) =>{
     next(err)
   }
 });
-
 
 
 module.exports = router;

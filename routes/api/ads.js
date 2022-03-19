@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Anuncio = require("../../models/Anuncio.js");
-//const jwtAuth = require("../../lib/jwtAuthMiddleware");
+const Usuario = require("../../models/Usuario.js");
+const jwtAuth = require("../../lib/jwtAuthMiddleware");
 const multer = require("multer");
 const path = require("path");
 const notification = require('../../controllers/notificationContoller')
@@ -19,7 +20,8 @@ const storage = multer.diskStorage({
     cb(null, path.join(__dirname, "../../public/images/anuncios"));
   },
   filename: function (req, file, cb) {
-    cb(null, file.fieldname + Date.now(), file.originalname);
+   // cb(null, file.fieldname + Date.now(), file.originalname);
+   cb(null, file.originalname)
   },
 });
 
@@ -92,20 +94,29 @@ router.get("/:identificador", async (req, res, next) => {
 //const path = require("path");
 //POST /api/ads (body)
 //Crear un anuncio
-router.post("/", upload.single("imagen"), async (req, res, next) => {
+router.post("/", upload.single("imagen"), jwtAuth, async (req, res, next) => {
   console.log("Entra en API POST");
 
   //console.log("req.apiAuthUserId", req.apiAuthUserId);
+  //busca el usuario el nombre del usuario para insertarlo
+  user = await Usuario.findById({_id:req.apiAuthUserId});
+  console.log("User--->",user);
 
   console.log("Entra en API POST");
+
   try {
-    const filename = req.file.filename;
+    const filename = req.file? req.file.filename: "imagen_generica";
     //console.log("req.apiAuthUserId", req.apiAuthUserId);
+   // const username = user.nombre;
+   //const userData ={_nombre:user.nombre,_id:req.apiAuthUserId};
+   
+
     const anuncioData = {
       ...req.body,
       //image: req.file.path,
       imagen: filename,
       usuario: req.apiAuthUserId,
+      usuario_nombre: user.nombre
     };
 
     const anuncio = new Anuncio(anuncioData);
