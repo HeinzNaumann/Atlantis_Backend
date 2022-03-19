@@ -1,30 +1,23 @@
 'use strict';
 
-// TODO:
-// verificar que si no existe el usuario el error es que no existe usuario
 
 const mongoose = require('mongoose');
 const nodemailer = require('nodemailer');
-const bcrypt = require('bcrypt');
 const emailTransportConfigure = require('../lib/emailTransportConfigure');
 
 // creo el esquema
-const usuarioSchema = mongoose.Schema({
-  nombre: { type: String, unique: true },
-  email: { type: String, unique: true },
-  password: { type: String, require:true },
-  favs: { type: [String], index: true },
-  conectado: { type: Boolean},
+const chatSchema = mongoose.Schema({
+  anuncio_nombre: { type: String },
+  anuncio: { type: String},
+  propietario: { type: String },
+  propietario_nombre: { type: String },
+  usuario_int: { type: String, index: true },
+  usuario_int_nombre: { type: String, index: true },
+  mensajes: { type: [String] },
+  createdAt: { type: Date, default: Date.now }
 });
 
-usuarioSchema.statics.hashPassword = function(passwordEnClaro) {
-  return bcrypt.hash(passwordEnClaro, 7);
-}
-
-usuarioSchema.methods.comparePassword = function(passwordEnClaro) {
-  return bcrypt.compare(passwordEnClaro, this.password);
-}
-
+/* 
 usuarioSchema.statics.notExistEmail = function(email){
   const query = Usuario.find(email); 
    //const res = await query.exec();
@@ -83,9 +76,9 @@ usuarioSchema.statics.updateFav = async function(usuario,fav){
   return result;
 
 }  
-
+ */
 // creo el modelo
-const Usuario = mongoose.model('Usuario', usuarioSchema);
+const Chat = mongoose.model('Chat', chatSchema);
 
 // exporto el modelo
-module.exports = Usuario;
+module.exports = Chat;

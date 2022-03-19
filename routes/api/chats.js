@@ -1,105 +1,22 @@
 var express = require('express');
 var router = express.Router();
-const {Usuario, Anuncio} = require('../../models')
+const {Usuario, Anuncio, Chat} = require('../../models')
 const jwtAuth = require('../../lib/jwtAuthMiddleware')
 const bcrypt = require('bcrypt');
 
 
-/* GET users listing. */
-/* router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
- */
-
-router.delete('/:id', jwtAuth, async (req, res, next)=> {
- 
-  const _id = req.params.id;
-
-  try {
-    console.log(`El usuario ${_id} ha sido eliminado`);
-    await Usuario.deleteOne({ _id: _id });
-    
-    //Borrar anuncios del usuario
-    await Anuncio.deleteAdsByUser(_id);
-    //console.log(`Se han eliminado ${ads} anuncios`);
-
-    res.json();
-  } catch (error) {
-    next(error);
-  };
-})
-
 router.post("/", async (req, res, next) =>{
     
-  console.log("crear usuario");
+  console.log("crear chat");
 
-    //para recuperar contraseña del usuario que solo envia nombre
-  if(req.body.nombre && !req.body.email && !req.body.password){
-    const nombre ={'nombre':req.body.nombre}
-    const resu =await Usuario.notExistName(nombre);
-    const user =resu[0];
-
-   
-     if(user.length === 0){
-      res.json({ result: "No existe un usuario con ese nombre en el sistema" });
-      return;
-     }
-     //generamos una clave aleatoria
-     const clave = Math.random().toString(36).slice(2) + Math.random().toString(36).toUpperCase().slice(2);
-     //actualizamos la contraseña en la BD
-      const pass = await bcrypt.hash(clave, 7)
-      const userUpdate= await Usuario.updateOne({ _id: {$eq: user._id}}, {$set: {password:pass}} );
-      
-      //console.log("Usuario ACTU:",userUpdate);
-
-      if(!userUpdate){
-         res.json({ result: "No se ha podido procesar el reseteo de clave, vuelva a intentarlo" });
-         return;
-      }
-
-    // enviar email al usuario
-    const result = await Usuario.enviarEmail(
-      "Recuperación de clave - Atlantis",
-      `Hola ${nombre.nombre}, su nueva clave de acceso es: ${clave}`,
-       user.email      
-     );
-     console.log("CLAVE", clave);
-     console.log("Mensaje enviado", result.messageId);
-
-     if(result.messageId){
-      res.json({ result: "Se ha enviado un correo con su nueva clave" });
-      return;
-     }
-
-  }
-
-  //si no envia todos los datos obligatorios para el registro
-  if(!req.body.nombre || !req.body.email || !req.body.password){
-    res.json({ result: "Los campos nombre, email y contraseña son obligatorios" });
-    return;
-  }
-
-  //si existe el nombre o correo no se crea
-  const nombre ={'nombre':req.body.nombre}
-  const email ={'email': req.body.email}
-  const existeNombre = await Usuario.notExistName(nombre);
-  const existeEmail = await Usuario.notExistEmail(email);
-
- 
-  if((existeNombre.length>0) || (existeEmail.length>0)){
-    res.json({ msg: "Name or Email allready exits in our system, pleaser try with another one." });
-    return;
-  }
   try{
-      const clave = await bcrypt.hash(req.body.password, 7)
-      const usuarioData = {
-        ...req.body, 
-        password:clave
+      const chatData = {
+        ...req.body
       };        
       
 
-      const usuario = new Usuario(usuarioData);
-      const createdUsuario = await usuario.save();
+      const chat = new Chat(chatData);
+      const createdChat = await Chat.save();
 
       // enviar email al usuario
 /* 			const result = await Usuario.enviarEmail(
@@ -114,7 +31,7 @@ router.post("/", async (req, res, next) =>{
           
 				//	console.log("ver mensaje", result.getTestMessageUrl);
      // console.log(createdUsuario)
-         res.status(201).json({ msg: "User created succesfully" });
+         res.status(201).json({ msg: "User created succesfully", chat: createdChat });
 
   } catch (err){
       next(err);
