@@ -130,7 +130,7 @@ router.post("/", upload.single("imagen"), jwtAuth, async (req, res, next) => {
 
 //DELETE /api/ads:id
 //Elimina un anuncio
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id", jwtAuth, async (req, res, next) => {
   try {
     const _id = req.params.id;
 
@@ -149,7 +149,7 @@ router.delete("/:id", async (req, res, next) => {
 
 //PUT /api/ads:id (body)lo que quiero actualizar
 //Actualizar un anuncio
-router.put("/:id", upload.single("imagen"), async (req, res, next) => {
+router.put("/:id", upload.single("imagen"), jwtAuth, async (req, res, next) => {
   try {
     //console.log("Entra en PUT");
     const _id = req.params.id;
