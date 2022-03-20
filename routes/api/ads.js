@@ -149,11 +149,12 @@ router.delete("/:id", async (req, res, next) => {
 
 //PUT /api/ads:id (body)lo que quiero actualizar
 //Actualizar un anuncio
-router.put("/:id", async (req, res, next) => {
+router.put("/:id", upload.single("imagen"), async (req, res, next) => {
   try {
     //console.log("Entra en PUT");
     const _id = req.params.id;
-    const anuncioData = req.body;
+    const filename = req.file.filename;
+
 
     //Si es una peticion de actualizar campo reservado
     //console.log("res: ", req.query.res)
@@ -190,6 +191,11 @@ router.put("/:id", async (req, res, next) => {
       );
       res.json({ result: "Anuncio en venta" });
       return;
+    }
+    let anuncioData = req.body;
+
+    if (filename) {
+      anuncioData = {...req.body, imagen: filename}  
     }
 
     const updatedAnuncio = await Anuncio.findOneAndUpdate(
