@@ -126,7 +126,7 @@ router.post("/", upload.single("imagen"), jwtAuth, async (req, res, next) => {
 
 //DELETE /api/ads:id
 //Elimina un anuncio
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id", jwtAuth, async (req, res, next) => {
   try {
     const _id = req.params.id;
 
@@ -187,7 +187,6 @@ router.put("/:id", upload.single("imagen"), jwtAuth, async (req, res, next) => {
       res.json({ result: "Anuncio en venta" });
       return;
     }
-
     let anuncioData = req.body;
 
     if (filename) {
