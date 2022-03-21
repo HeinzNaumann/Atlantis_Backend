@@ -14,69 +14,74 @@ const chatSchema = mongoose.Schema({
   usuario_int: { type: String, index: true },
   usuario_int_nombre: { type: String, index: true },
   mensajes: { type: [{nombre:{type: String},mensaje:{type: String},createdAtMsg: { type: Date, default: Date.now }}] },
-  createdAt: { type: Date, default: Date.now }
+  updatedAt: { type: Date, default: Date.now }
 });
 
-/* 
-usuarioSchema.statics.notExistEmail = function(email){
-  const query = Usuario.find(email); 
-   //const res = await query.exec();
-   //console.log("ResE: ", res);
-  return query.exec();
+
+chatSchema.statics.getChatUser = async function(user,ad){
+  let chatad=[];
+  let arraybuyer=[];
+  let result=[];
+  //let arrayseller=[];
+  if(ad){
+    // chatad = await Chat.find({anuncio:ad});
+     arraybuyer = await Chat.existChatUserAd(user,ad);  //si es comprador
+  }
+  if(!ad){ //Viene del header propietario o usuario
+    chatad = await Chat.getAllChat(user);
+    result = [...chatad]
+  }
+  //si es comprador
+  // const arraybuyer = chatad.filter(ad =>ad.usuario_int == user);
+  //si es vendedor 
+  //arrayseller = chatad.filter(ad =>ad.propietario == user);
+  
+  if(arraybuyer.length>0){
+     const allchat = await Chat.getAllChat(user); // obtiene todos sus chats
+     result =[...arraybuyer, ...allchat];
+
+    /* if(arrayseller.length>0){
+       result = arrayseller.length>1? arrayseller.sort((t1, t2) => t2.updatedAt.localeCompare(t1.updatedAt)): arrayseller;
+       result =[...arraybuyer,...result];
+    }else{ // es comprador y ya tiene un chat con ese anuncio
+       const allchat = await getAllChat(user); // obtiene todos sus chats
+       //result = allchat.sort((t1, t2) => t2.updatedAt.localeCompare(t1.updatedAt))
+       result =[...arraybuyer, ...allchat];
+    } */
+  }else{
+   /*  if(arrayseller.length>0){
+      result = arrayseller.length>1? arrayseller.sort((t1, t2) => t2.updatedAt.localeCompare(t1.updatedAt)): arrayseller;
+    } */
+    //es comprador pero no tiene chat con ese anuncio, devolver el resto de sus chats
+    if((arraybuyer.length==0)&&(ad)){
+      const allchat = await Chat.getAllChat(user); // obtiene todos sus chats
+      result = [...allchat];
+    }
+  }
+  return result;
 }
 
-usuarioSchema.statics.notExistName = function(nombre){
-  const query = Usuario.find(nombre); 
-   //const res = await query.exec();
-   //console.log("ResN: ", res);
-  return query.exec();
+
+
+chatSchema.statics.existChatUserAd = async function(user,ad){
+  const chatad = await Chat.find({anuncio:ad});
+  //si es comprador
+  const arraybuyer = chatad.filter(ad =>ad.usuario_int == user);
+  return arraybuyer;
 }
 
-usuarioSchema.statics.updateFav = async function(usuario,fav){
 
-  // buscar el usuario en la base de datos
-  const user = await Usuario.findOne({ _id:usuario });
-  let arrayFavs = [...user.favs];
-  let res=[];
-  // si existe ese anuncio en favoritos se elimina
-  if(arrayFavs.filter(element=>element === fav).length>0){
-     res = arrayFavs.filter(element=>element !== fav);
-  }else{ // si no existe lo añado
-     res = [...arrayFavs,fav];
+chatSchema.statics.getAllChat = async function(user){
+  let chatad = await Chat.find({propietario:user}); // como propietario
+  let chatad2 = await Chat.find({usuario_int:user}); // como cliente
+  chatad = [...chatad,...chatad2]
+    if(chatad.length>0){
+    chatad = chatad.sort((t1, t2) => t2.updatedAt.toString().localeCompare(t1.updatedAt.toString()))
   }
 
-  // actualizo la BD con el nuevo array de fav de ese usuario
-  const usuarioData = { favs: res }
-  const updatedUsuario = await Usuario.findOneAndUpdate({ _id: usuario}, usuarioData, {
-    new: true
-  });
-
-   if(!updatedUsuario){
-        //res.status(404).json({error: "not found"});
-        return res="Error al actualizar favoritos";
-    }
-  return res; 
+  return chatad;
 }
 
-
- usuarioSchema.statics.enviarEmail = async function(asunto, cuerpo, email) {
-
-  const transport = await emailTransportConfigure();
-
-  // enviar el email
-  const result = await transport.sendMail({
-    from: process.env.EMAIL_SERVICE_FROM,
-    to: email,
-    subject: asunto,
-    html: cuerpo
-  });
-
-  result.getTestMessageUrl = nodemailer.getTestMessageUrl(result);
-
-  return result;
-
-}  
- */
 // creo el modelo
 const Chat = mongoose.model('Chat', chatSchema);
 

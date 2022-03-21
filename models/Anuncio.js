@@ -4,7 +4,7 @@ const adSchema = new mongoose.Schema({
   nombre: { type: String, index: true },
   imagen: String,
   descripcion: { type: String },
-  venta: { type: Boolean, index: true },
+  venta: { type: String, index: true },
   precio: { type: Number, index: true },
   tags: { type: [String], index: true },
   reservado: { type: Boolean },

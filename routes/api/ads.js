@@ -105,10 +105,6 @@ router.post("/", upload.single("imagen"), jwtAuth, async (req, res, next) => {
 
   try {
     const filename = req.file? req.file.filename: "imagen_generica";
-    //console.log("req.apiAuthUserId", req.apiAuthUserId);
-   // const username = user.nombre;
-   //const userData ={_nombre:user.nombre,_id:req.apiAuthUserId};
-   
 
     const anuncioData = {
       ...req.body,
@@ -149,11 +145,11 @@ router.delete("/:id", async (req, res, next) => {
 
 //PUT /api/ads:id (body)lo que quiero actualizar
 //Actualizar un anuncio
-router.put("/:id", async (req, res, next) => {
+router.put("/:id", upload.single("imagen"), jwtAuth, async (req, res, next) => {
   try {
     //console.log("Entra en PUT");
     const _id = req.params.id;
-    const anuncioData = req.body;
+    const filename = req.file? req.file.filename: ""; // si no envio nada en la imagen lo deja en blanco
 
     //Si es una peticion de actualizar campo reservado
     //console.log("res: ", req.query.res)
@@ -192,6 +188,12 @@ router.put("/:id", async (req, res, next) => {
       return;
     }
 
+    let anuncioData = req.body;
+
+    if (filename) {
+      anuncioData = {...req.body, imagen: filename}  
+    }
+
     const updatedAnuncio = await Anuncio.findOneAndUpdate(
       { _id: _id },
       anuncioData,
@@ -208,17 +210,7 @@ router.put("/:id", async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-  //res.json({ result: '-1' });
 });
-
-// /api/ads/tags
-//Lista de anuncios
-/*
-router.get('/tags',function(req, res){
-    //tgs = Anuncio.listTags();
-    console.log("Entra en tags");
-    res.json({ result: "Tags" });
-});
-*/
 
 module.exports = router;
+
