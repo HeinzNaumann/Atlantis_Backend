@@ -15,6 +15,7 @@ const chatSchema = mongoose.Schema({
   usuario_int_nombre: { type: String, index: true },
   mensajes: { type: [{nombre:{type: String},mensaje:{type: String},createdAtMsg: { type: Date, default: Date.now }}] },
   nuevo_msj: { type: Boolean, default:true}, 
+  imagen: String,
   updatedAt: { type: Date, default: Date.now }
 });
 
@@ -38,7 +39,8 @@ chatSchema.statics.getChatUser = async function(user,ad){
   //arrayseller = chatad.filter(ad =>ad.propietario == user);
   
   if(arraybuyer.length>0){
-     const allchat = await Chat.getAllChat(user); // obtiene todos sus chats
+     let allchat = await Chat.getAllChat(user); // obtiene todos sus chats
+     allchat = allchat.filter(chat=> {chat._id!==arraybuyer[0]._id}); // elimino el chat q ya tengo en buyer pero tb allchat
      result =[...arraybuyer, ...allchat];
 
     /* if(arrayseller.length>0){
