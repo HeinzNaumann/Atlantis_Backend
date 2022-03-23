@@ -42,21 +42,16 @@ router.post("/", async (req, res, next) =>{
   }
 });
 
-// /api/users:id
-//metodo para obtener un usuario
+// /api/chats:id
+//metodo para obtener un chat
 router.get("/:identificador", async (req, res, next) =>{
   try{
-      const user = req.params.identificador;
-      let usuario="";
-     // if (user.match(/^[0-9a-fA-F]{24}$/)) {
-        // Yes, it's a valid ObjectId, proceed with `findById` call.
-       //   usuario = await Usuario.find({_id: user});
-      //}
-      const usuario2 = await Usuario.find({nombre: user});
-      if(usuario || usuario2){
-           res.json({ result: usuario || usuario2 });
+      const chatId = req.params.identificador;
+      const chat = await Chat.find({_id: chatId});
+      if(chat.length>0){
+           res.json({ result: chat});
        }else{
-           res.json({ result: "null" });
+           res.json({ result: "Chat no found" });
        }
   }catch(err){
       next (err);

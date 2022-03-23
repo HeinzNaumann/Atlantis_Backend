@@ -40,8 +40,9 @@ chatSchema.statics.getChatUser = async function(user,ad){
   
   if(arraybuyer.length>0){
      let allchat = await Chat.getAllChat(user); // obtiene todos sus chats
-     allchat = allchat.filter(chat=> {chat._id!==arraybuyer[0]._id}); // elimino el chat q ya tengo en buyer pero tb allchat
+     allchat = allchat.filter(chat=>chat._id.toString()!==arraybuyer[0]._id.toString())// elimino el chat q ya tengo en buyer pero tb allchat
      result =[...arraybuyer, ...allchat];
+    
 
     /* if(arrayseller.length>0){
        result = arrayseller.length>1? arrayseller.sort((t1, t2) => t2.updatedAt.localeCompare(t1.updatedAt)): arrayseller;
