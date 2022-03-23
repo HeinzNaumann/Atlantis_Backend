@@ -70,9 +70,14 @@ router.put("/:id", async (req, res, next) =>{
   
    console.log("Entra en PUT");
    try{
-      //si existe el nombre o correo no se actualiza
       const _id = req.params.id;
       const existeChat = await Chat.findById({_id:_id});
+      // actualiza el estado nuevo_msj a false cuando ya se ha leido
+      if(req.query.read){
+        await Chat.updateOne({ _id: {$eq:_id}}, {$set: {nuevo_msj:false}} );
+        res.json({ msg: "Chat updated, no new msj"});
+        return;
+      }
       
       if(!existeChat.length===0){
         res.json({ msg: "Chat not found"});
@@ -81,7 +86,7 @@ router.put("/:id", async (req, res, next) =>{
       //console.log("existeChat",existeChat);
       let msjs = existeChat.mensajes;
       msjs = [...msjs,{nombre:req.body.nombre, mensaje: req.body.mensaje }]
-      chatData = {
+      let chatData = {
             ...req.body, 
               mensajes:msjs,
               updatedAt: Date.now()        
@@ -112,7 +117,10 @@ router.put("/:id", async (req, res, next) =>{
 //Añadir o eliminar favoritos
 router.get("/",/* jwtAuth,*/ async (req, res, next) =>{
   try{
+    //console.log("req.query.ad",req.query.ad);
+
     const ad = req.query.ad? req.query.ad: 0; // id anuncio
+    //console.log("Ad",ad);
     const user = req.query.user; // id usuario 
     const existChat = await Chat.existChatUserAd(user,ad);
     const arrayChats = await Chat.getChatUser(user,ad);

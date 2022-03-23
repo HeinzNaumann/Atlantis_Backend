@@ -14,6 +14,7 @@ const chatSchema = mongoose.Schema({
   usuario_int: { type: String, index: true },
   usuario_int_nombre: { type: String, index: true },
   mensajes: { type: [{nombre:{type: String},mensaje:{type: String},createdAtMsg: { type: Date, default: Date.now }}] },
+  nuevo_msj: { type: Boolean, default:true}, 
   updatedAt: { type: Date, default: Date.now }
 });
 
