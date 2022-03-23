@@ -15,7 +15,7 @@ router.post("/", async (req, res, next) =>{
   try{
       const chatData = {
         ...req.body,
-        mensajes:[{nombre:req.body.nombre, mensaje: req.body.mensaje }]
+        //mensajes:[{nombre:req.body.nombre, mensaje: req.body.mensaje }]
       };        
       
 
@@ -89,6 +89,7 @@ router.put("/:id", async (req, res, next) =>{
       let chatData = {
             ...req.body, 
               mensajes:msjs,
+              nuevo_msj:true,
               updatedAt: Date.now()        
       };        
       
@@ -120,7 +121,7 @@ router.get("/",/* jwtAuth,*/ async (req, res, next) =>{
     //console.log("req.query.ad",req.query.ad);
 
     const ad = req.query.ad? req.query.ad: 0; // id anuncio
-    //console.log("Ad",ad);
+    //console.log("Ad",ad, "User:",req.query.user);
     const user = req.query.user; // id usuario 
     const existChat = await Chat.existChatUserAd(user,ad);
     const arrayChats = await Chat.getChatUser(user,ad);
