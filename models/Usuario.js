@@ -1,8 +1,7 @@
 'use strict';
 
-// TODO:
-// verificar que si no existe el usuario el error es que no existe usuario
 
+const jwt = require("jsonwebtoken");
 const mongoose = require('mongoose');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
@@ -83,6 +82,20 @@ usuarioSchema.statics.updateFav = async function(usuario,fav){
   return result;
 
 }  
+// te devuelve los favs de un usuario pasado su token
+usuarioSchema.statics.getFavByToken= async function(token){
+  // comprobar que el token es válido
+	   let userId; 
+     jwt.verify(token, process.env.JWT_SECRET, (err, payload) => {
+      if (err) {
+          return null;
+      }
+      userId = payload._id;
+     });
+     const user = await Usuario.findById({_id:userId});
+     return user.favs;
+}
+
 
 // creo el modelo
 const Usuario = mongoose.model('Usuario', usuarioSchema);

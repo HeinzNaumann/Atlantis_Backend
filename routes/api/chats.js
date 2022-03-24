@@ -35,7 +35,7 @@ router.post("/", async (req, res, next) =>{
           
 				//	console.log("ver mensaje", result.getTestMessageUrl);
      // console.log(createdUsuario)
-         res.status(201).json({ msg: "Chat created succesfully", chat: createdChat });
+         res.status(201).json({chat: createdChat});
 
   } catch (err){
       next(err);

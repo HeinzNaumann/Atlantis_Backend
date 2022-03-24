@@ -62,7 +62,41 @@ adSchema.statics.UpdateUserName = function(iduser,newname){
     )
   })
 }
-  
+
+function dataConstruct(element,tf){
+  const data ={
+    _id: element._id,
+    nombre: element.nombre,
+    imagen: element.imagen,
+    descripcion: element.descripcion,
+    venta: element.venta,
+    precio: element.precio,
+    tags: element.tags,
+    reservado: element.reservado,
+    vendido: element.vendido,
+    usuario: element.usuario,
+    usuario_nombre: element.usuario_nombre,
+    createdAt: element.createdAt,
+    fav:tf
+  }
+  return data;
+}
+
+adSchema.statics.adsWithFavs= function(anuncios,arryUserFav){
+   let arrayWithFav=[];
+   let data="";
+  anuncios.forEach(element =>{
+    const res=arryUserFav.filter(fav => fav === element._id.toString())
+    if(res.length>0){
+        data = dataConstruct(element,true)
+        arrayWithFav=[...arrayWithFav,data];
+    }else{
+        data = dataConstruct(element,false)
+        arrayWithFav=[...arrayWithFav,data];
+    }
+  })
+  return arrayWithFav;
+}
   
 const Ad = mongoose.model("Anuncio", adSchema)
 

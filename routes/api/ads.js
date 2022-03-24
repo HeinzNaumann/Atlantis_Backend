@@ -44,6 +44,12 @@ router.get(
       //const start = parseInt(req.query.start) || 0;
       const user = req.query.user; // para filtrar por anuncios de ese usuario
 
+      //Si es un usuario registrado el que hace la petición, devuelve su array de fav
+      let arryUserFav=0;
+      if(req.header('Authorization')){
+         arryUserFav= await Usuario.getFavByToken(req.header('Authorization'))
+       }
+
       const filter = {};
       if (name) {
         filter.nombre = name;
@@ -58,8 +64,14 @@ router.get(
         filter.usuario = user;
       }
 
-      const anuncios = await Anuncio.lista(filter, skip, limit, select, sort);
+      let anuncios = await Anuncio.lista(filter, skip, limit, select, sort);
       //console.log("ANUNCIOS", anuncios)
+
+      //si es usuario registrado el que hace la peticion, añado un campo marcando cuales son los ads fav del usuario
+      if(arryUserFav && arryUserFav.length>0){
+        anuncios = Anuncio.adsWithFavs(anuncios,arryUserFav);
+      }
+      
       res.json({ results: anuncios, totalads: anuncios.length });
     } catch (err) {
       next(err);
