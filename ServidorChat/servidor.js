@@ -3,6 +3,9 @@ const http = require('http');
 const app = express();
 const servidor = http.createServer(app)
 
+const {getUserWithFav} = require('./chatDataService.cjs')
+
+
 const socketio = require('socket.io');
 const { CLIENT_RENEG_LIMIT } = require('tls');
 const io = socketio(servidor,{
@@ -12,8 +15,12 @@ const io = socketio(servidor,{
     }
 })
 
+
+
+
 let onlineUser=[];
 const addNewUser =(username,socketId)=>{
+    console.log("onlineUser",onlineUser)
     !onlineUser.some(user=>user.username === username) && 
         onlineUser.push({username,socketId});
 }
@@ -35,15 +42,30 @@ io.on('connection', socket =>{
         //socket.broadcast.emit("mensajes", {nombre:nombre, mensaje:`${nombre} esta conectado`})
         console.log("Usuario conectado");
         })
-        socket.on('sendNotification',({senderName,recieverName,type})=>{
-            const recep= getUser(recieverName);
-            if(recep){ // si esta conectado el usuario
-                io.to(recep.socketId).emit("getNotification",{
-                    senderName,
-                    type,
-                })
-
-            }
+        socket.on('sendNotification',({senderName,recieverName,article,article_name,type})=>{
+            //Buscar art en fav de usuarios de usuarios y notificar
+            //console.log("Article",article) 
+            getUserWithFav(article).then(response=>{
+                const arrayUsersFav= response.data.result;
+                if(arrayUsersFav.length>0){
+                   arrayUsersFav.forEach(user=>{
+                       const recep= getUser(user.nombre);
+                       if(recep){// si esta conectado el usuario
+                           io.to(recep.socketId).emit("getNotification",{
+                               article_name,
+                               type,
+                           })
+                           console.log("Entra en Noti")
+                       }else{
+                           //enviar mail
+                          // sendMail(article_name,user.email)
+                       }
+                   })
+               }  
+            })
+              
+                
+                     
         })
 
 

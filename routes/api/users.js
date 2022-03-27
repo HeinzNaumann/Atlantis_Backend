@@ -3,6 +3,7 @@ var router = express.Router();
 const {Usuario, Anuncio} = require('../../models')
 const jwtAuth = require('../../lib/jwtAuthMiddleware')
 const bcrypt = require('bcrypt');
+const { query } = require('express');
 
 
 /* GET users listing. */
@@ -125,7 +126,15 @@ router.post("/", async (req, res, next) =>{
 //metodo para obtener un usuario
 router.get("/:identificador", async (req, res, next) =>{
   try{
+
       const user = req.params.identificador;
+      //Si la peticion es de usuarios que tenga un anuncio concreto como fav
+      if(user=="users" && req.query.ad){
+        const arrayUsrWithFav= await Usuario.getUserWithFav(req.query.ad)
+        res.json({ result:arrayUsrWithFav});
+        return;
+      }
+
       let usuario="";
       if (user.match(/^[0-9a-fA-F]{24}$/)) {
         // Yes, it's a valid ObjectId, proceed with `findById` call.

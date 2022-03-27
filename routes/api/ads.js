@@ -187,7 +187,7 @@ router.put("/:id", upload.single("imagen"), jwtAuth, async (req, res, next) => {
         { _id: { $eq: _id } },
         { $set: { vendido: true } }
       );
-      notification(_id)
+      //notification(_id)
       res.json({ result: "Anuncio vendido" });
       return;
     }

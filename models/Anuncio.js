@@ -7,8 +7,8 @@ const adSchema = new mongoose.Schema({
   venta: { type: String, index: true },
   precio: { type: Number, index: true },
   tags: { type: [String], index: true },
-  reservado: { type: Boolean },
-  vendido: { type: Boolean },
+  reservado: { type: Boolean,default:false },
+  vendido: { type: Boolean, default:false },
   usuario: { type: String, index: true },
   usuario_nombre: { type: String, index: true },
   createdAt: { type: Date, default: Date.now }

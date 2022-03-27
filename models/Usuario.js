@@ -64,6 +64,24 @@ usuarioSchema.statics.updateFav = async function(usuario,fav){
   return res; 
 }
 
+usuarioSchema.statics.getUserWithFav = async function(anuncio){
+  let usersWithFav=[]
+  const arrayUser = await Usuario.find ({
+    favs: {$in: [anuncio]}
+  })
+  
+   // return query;
+   // console.log("ArrayUser--->", arrayUser);
+    if(arrayUser.length>0){
+        usersWithFav=arrayUser
+             /*  arrayUser.forEach(user=>{
+                  //console.log("user", user)
+                  usersWithFav.push(user)}) */
+    }
+    return usersWithFav;
+
+}
+
 
  usuarioSchema.statics.enviarEmail = async function(asunto, cuerpo, email) {
 
