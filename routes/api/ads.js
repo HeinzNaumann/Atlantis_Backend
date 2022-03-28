@@ -165,40 +165,32 @@ router.put("/:id", upload.single("imagen"), jwtAuth, async (req, res, next) => {
 
     //Si es una peticion de actualizar campo reservado
     //console.log("res: ", req.query.res)
-    if (req.query.res === "true") {
+    if (req.query.res) {
+      let state="";
+      let ad = await Anuncio.findOne({ _id: _id});
+      state=(ad.reservado === true)? false:true;
       await Anuncio.updateOne(
         { _id: { $eq: _id } },
-        { $set: { reservado: true } }
+        { $set: { reservado: state } }
       );
-      res.json({ result: "Anuncio reservado" });
+      res.json({ result: state?"Anuncio reservado":"Anuncio disponible" });
       return;
     }
-    if (req.query.res === "false") {
-      await Anuncio.updateOne(
-        { _id: { $eq: _id } },
-        { $set: { reservado: false } }
-      );
-      res.json({ result: "Anuncio disponible" });
-      return;
-    }
+
     //Si es una peticion de actualizar campo vendido
-    if (req.query.vend === "true") {
+    if (req.query.vend) {
+      let state="";
+      let ad = await Anuncio.findOne({ _id: _id});
+      state=(ad.vendido === true)? false:true;
       await Anuncio.updateOne(
         { _id: { $eq: _id } },
-        { $set: { vendido: true } }
+        { $set: { vendido: state } }
       );
       //notification(_id)
-      res.json({ result: "Anuncio vendido" });
+      res.json({ result:state?"Anuncio vendido":"Anuncio en venta" });
       return;
     }
-    if (req.query.vend === "false") {
-      await Anuncio.updateOne(
-        { _id: { $eq: _id } },
-        { $set: { vendido: false } }
-      );
-      res.json({ result: "Anuncio en venta" });
-      return;
-    }
+  
     let anuncioData = req.body;
 
     if (filename) {

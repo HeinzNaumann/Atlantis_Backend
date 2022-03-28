@@ -44,10 +44,11 @@ io.on('connection', socket =>{
         })
         socket.on('sendNotification',({senderName,recieverName,article,article_name,type})=>{
             //Buscar art en fav de usuarios de usuarios y notificar
-            //console.log("Article",article) 
+            //console.log("Article Recibido",article) 
             getUserWithFav(article).then(response=>{
-                const arrayUsersFav= response.data.result;
+               const arrayUsersFav= response.data.result;
                 if(arrayUsersFav.length>0){
+                    //console.log("Array->",arrayUsersFav)
                    arrayUsersFav.forEach(user=>{
                        const recep= getUser(user.nombre);
                        if(recep){// si esta conectado el usuario
@@ -55,7 +56,7 @@ io.on('connection', socket =>{
                                article_name,
                                type,
                            })
-                           console.log("Entra en Noti")
+                           //console.log("Entra en Noti")
                        }else{
                            //enviar mail
                           // sendMail(article_name,user.email)
