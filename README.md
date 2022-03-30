@@ -1,5 +1,10 @@
 # MiAtlantis
 
+Links to Backend and Frontend
+
+https://github.com/kikonavarro/AtlantisBackend
+https://github.com/kikonavarro/AtlantisFrontend
+
 ## Adverts Sell and Buy App. Final Project.
 
 Develop of a APP that runs on the server (AWS - Ubuntu - Nginx) using React App and Node JS.
