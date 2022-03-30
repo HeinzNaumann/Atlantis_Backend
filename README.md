@@ -2,8 +2,8 @@
 
 Links to Backend and Frontend
 
-https://github.com/kikonavarro/AtlantisBackend
-https://github.com/kikonavarro/AtlantisFrontend
+- https://github.com/kikonavarro/AtlantisBackend
+- https://github.com/kikonavarro/AtlantisFrontend
 
 ## Adverts Sell and Buy App. Final Project.
 
