@@ -5,12 +5,6 @@ const jwtAuth = require("../../lib/jwtAuthMiddleware");
 const bcrypt = require("bcrypt");
 const { query } = require("express");
 
-/* GET users listing. */
-/* router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
- */
-
 router.delete("/:id", jwtAuth, async (req, res, next) => {
 	const _id = req.params.id;
 
@@ -20,7 +14,6 @@ router.delete("/:id", jwtAuth, async (req, res, next) => {
 
 		//Borrar anuncios del usuario
 		await Anuncio.deleteAdsByUser(_id);
-		//console.log(`Se han eliminado ${ads} anuncios`);
 
 		res.json();
 	} catch (error) {
@@ -134,7 +127,6 @@ router.get("/:identificador", async (req, res, next) => {
 
 		let usuario = "";
 		if (user.match(/^[0-9a-fA-F]{24}$/)) {
-			// Yes, it's a valid ObjectId, proceed with `findById` call.
 			usuario = await Usuario.find({ _id: user });
 		}
 		const usuario2 = await Usuario.find({ nombre: user });
@@ -169,7 +161,6 @@ router.put("/:id", jwtAuth, async (req, res, next) => {
 			}
 		}
 
-		//console.log("Entra en PUT");
 		const _id = req.params.id;
 		let usuarioData = { ...req.body };
 		//Si existe datos en el campo password sobrescribo usuarioData con pass encriptada
@@ -180,8 +171,6 @@ router.put("/:id", jwtAuth, async (req, res, next) => {
 				password: clave,
 			};
 		}
-
-		// console.log("Body Req:", req.body);
 
 		const updatedUsuario = await Usuario.findOneAndUpdate(
 			{ _id: _id },

@@ -2,8 +2,6 @@
 
 const jwt = require("jsonwebtoken");
 const { Usuario } = require("../models");
-const nodemailer = require("nodemailer");
-const emailTransportConfigure = require("../lib/emailTransportConfigure");
 
 class LoginController {
 	index(req, res, next) {
@@ -14,8 +12,6 @@ class LoginController {
 	async post(req, res, next) {
 		try {
 			const { nombre, password } = req.body;
-
-      
 
 			// buscar el usuario en la base de datos
 			const usuario = await Usuario.findOne({ nombre });
@@ -32,70 +28,74 @@ class LoginController {
 			req.session.usuarioLogado = {
 				_id: usuario._id,
 			};
-
 		} catch (err) {
 			next(err);
 		}
 	}
 
+	async logout(req, res, next) {
+		//poner el estado de conectado a true de ese usuario en la BD
+		// apiAuthUserId viene creado en el paso previo de verificar el token en jwtAuth antes pasar a logout
+		await Usuario.updateOne(
+			{ _id: { $eq: req.apiAuthUserId } },
+			{ $set: { conectado: false } }
+		);
+		res.redirect("/");
+	}
 
-    async logout(req, res, next) {
+	// POST /api/auth
+	async postJWT(req, res, next) {
+		try {
+			const { nombre, password } = req.body;
 
-        //poner el estado de conectado a true de ese usuario en la BD
-        // apiAuthUserId viene creado en el paso previo de verificar el token en jwtAuth antes pasar a logout
-        await Usuario.updateOne({ _id: {$eq: req.apiAuthUserId}}, {$set: {conectado:false}} );
-        res.redirect('/');
-       
-      }
-    
-    // POST /api/auth
-    async postJWT(req, res, next) {
-        try {
-          const { nombre, password } = req.body;
+			if (!nombre || !password) {
+				res.json({ msg: "Name and password are required" });
+				return;
+			}
 
-          if (!nombre || !password) {
-            res.json({ msg: "Name and password are required"});
-            return;
-          }
+			// buscar el usuario en la BD
+			const usuario = await Usuario.findOne({ nombre });
 
-           // buscar el usuario en la BD
-          const usuario = await Usuario.findOne({ nombre });
-    
-          // si no lo encuentro el usuario en el sistema --> error
-          if (!usuario) {
-            res.json({ msg:"User doesnt exist" });
-            return;
-          }
+			// si no lo encuentro el usuario en el sistema --> error
+			if (!usuario) {
+				res.json({ msg: "User doesnt exist" });
+				return;
+			}
 
-           // si lo encuentro pero no coincide la contraseña --> error
-          if (!await usuario.comparePassword(password)) {
-            res.json({ msg: "Password not correct"});
-            return;
-          }
-    
-          // si el usuario existe y valida la contraseña
-          // crear un JWT con el _id del usuario dentro
-          jwt.sign({ _id: usuario._id }, process.env.JWT_SECRET, { 
-            expiresIn: '2d' 
-          }, async (err, jwtToken) => {
-            if (err) {
-              next(err);
-              return;
-            }
-          
-            //poner el estado de conectado a true de ese usuario en la BD
-            await Usuario.updateOne({ _id: {$eq: usuario._id}}, {$set: {conectado:true}} );
+			// si lo encuentro pero no coincide la contraseña --> error
+			if (!(await usuario.comparePassword(password))) {
+				res.json({ msg: "Password not correct" });
+				return;
+			}
 
-            // devolver al cliente el token generado
-            res.json({ token: jwtToken });
-          });
-    
-        } catch (err) {
-          next();
-        }
-      }
-    
+			// si el usuario existe y valida la contraseña
+			// crear un JWT con el _id del usuario dentro
+			jwt.sign(
+				{ _id: usuario._id },
+				process.env.JWT_SECRET,
+				{
+					expiresIn: "2d",
+				},
+				async (err, jwtToken) => {
+					if (err) {
+						next(err);
+						return;
+					}
 
+					//poner el estado de conectado a true de ese usuario en la BD
+					await Usuario.updateOne(
+						{ _id: { $eq: usuario._id } },
+						{ $set: { conectado: true } }
+					);
+
+					// devolver al cliente el token generado
+					res.json({ token: jwtToken });
+				}
+			);
+		} catch (err) {
+			next();
+		}
+	}
 }
 
 module.exports = LoginController;
