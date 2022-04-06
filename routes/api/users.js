@@ -4,6 +4,7 @@ const { Usuario, Anuncio } = require("../../models");
 const jwtAuth = require("../../lib/jwtAuthMiddleware");
 const bcrypt = require("bcrypt");
 const { query } = require("express");
+const jwt = require("jsonwebtoken");
 
 router.delete("/:id", jwtAuth, async (req, res, next) => {
 	const _id = req.params.id;
@@ -34,39 +35,43 @@ router.post("/", async (req, res, next) => {
 			});
 			return;
 		}
+
+		//Si existe el usuario generamos un token por 5min para restaurar la contraseña
+		jwt.sign(
+			{ _id: user._id },
+			process.env.JWT_SECRET,
+			{
+				expiresIn: "5m",
+			},
+			async (err, jwtToken) => {
+				if (err) {
+					next(err);
+					return;
+				}
+				// enviar email al usuario
+				const url=`${process.env.REACT_APP_FRONT_ATLANTIS_URL}/change-password/${jwtToken}`;
+				//console.log("Entra URL", url);
+				const result = await Usuario.enviarEmail(
+					"Recuperación de clave - Atlantis",
+					`Hola ${nombre.nombre}, puede crear una nueva contraseña desde: ${url}`,
+					user.email
+				);
+				
+				console.log("Mensaje enviado", result.messageId);
+
+				if (result.messageId) {
+					res.json({ result: `Se ha enviado un correo con las instrucciones a su correo` });
+					return;
+				}
+			}
+		);
+
+		return;
 		//generamos una clave aleatoria
-		const clave =
+		/* const clave =
 			Math.random().toString(36).slice(2) +
-			Math.random().toString(36).toUpperCase().slice(2);
-		//actualizamos la contraseña en la BD
-		const pass = await bcrypt.hash(clave, 7);
-		const userUpdate = await Usuario.updateOne(
-			{ _id: { $eq: user._id } },
-			{ $set: { password: pass } }
-		);
+			Math.random().toString(36).toUpperCase().slice(2); */
 
-		//console.log("Usuario ACTU:",userUpdate);
-
-		if (!userUpdate) {
-			res.json({
-				result: "No se ha podido procesar el reseteo de clave, vuelva a intentarlo",
-			});
-			return;
-		}
-
-		// enviar email al usuario
-		const result = await Usuario.enviarEmail(
-			"Recuperación de clave - Atlantis",
-			`Hola ${nombre.nombre}, su nueva clave de acceso es: ${clave}`,
-			user.email
-		);
-		console.log("CLAVE", clave);
-		console.log("Mensaje enviado", result.messageId);
-
-		if (result.messageId) {
-			res.json({ result: "Se ha enviado un correo con su nueva clave" });
-			return;
-		}
 	}
 
 	//si no envia todos los datos obligatorios para el registro
@@ -141,6 +146,46 @@ router.get("/:identificador", async (req, res, next) => {
 	}
 });
 
+// para cambiar la contraseña desde el enlace generado en el POST
+router.put("/",async (req, res, next) => {
+	try {
+		const jwtToken = req.body.token;
+		const password = req.body.password;
+		let userId="";
+		// comprobar que el token es válido
+		jwt.verify(jwtToken, process.env.JWT_SECRET, async (err, payload) => {
+			if (err) {
+				res.json({ msg: `El enlace ha expirado, vuelva a solicitarlo` });
+				return;
+			}else{
+			
+			userId = payload._id;
+			const user = await Usuario.findById({_id:userId});
+			console.log("Usuario", user.nombre);
+	
+			//actualizamos la contraseña en la BD
+			const pass = await bcrypt.hash(password, 7);
+			const userUpdate = await Usuario.updateOne(
+				{ _id: { $eq: userId } },
+				{ $set: { password: pass } }
+			);
+	
+	
+			if(userUpdate){
+				res.json({ msg: `Contraseña actualizada!` });
+			}else{
+				res.json({ msg: `La contraseña no fue actualizada` });
+			}
+		
+		}
+
+		});
+		
+	} catch (err) {
+		next(err);
+	}
+});
+
 //PUT /api/users:id (body)lo que quiero actualizar
 //Actualizar un usuario
 router.put("/:id", jwtAuth, async (req, res, next) => {
@@ -193,6 +238,7 @@ router.put("/:id", jwtAuth, async (req, res, next) => {
 		next(err);
 	}
 });
+
 
 //GET /api/users?fav
 //Añadir o eliminar favoritos
